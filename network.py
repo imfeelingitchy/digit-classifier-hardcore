@@ -1,5 +1,6 @@
 import numpy as np, random as rd
 
+# Misc functions
 def sigmoid(x): # activation function
     return 1 / (1 + np.exp(-x))
 
@@ -28,7 +29,7 @@ class Network(object):
             training_labels = training_labels[random_order]
             count = 1
             for training_data_batch, training_label_batch in zip(training_data, training_labels):
-                print("Updating network... Pass {} in epoch {}.".format(count, epoch))
+                print("Training network... Batch {} in epoch {}.".format(count, epoch))
                 self.update_network_using_mini_batch(zip(training_data_batch, training_label_batch), eta, len(training_data_batch))
                 count += 1
             print("Epoch {} complete".format(epoch))
@@ -76,13 +77,13 @@ class Network(object):
     def evaluate_performance(self, test_images, test_labels):
         how_many_correct = 0
         for x, y in zip(test_images, test_labels):
-            how_many_correct += int(np.argmax(self.feed_forward(x)) == y)
+            how_many_correct += int(np.argmax(self.feed_forward(x)) == y) # pass the test images into the network and get the prediction for each. The decision is taken as the highest activation in the output layer. Compare these with the labels.
         return how_many_correct
 
     def predict(self, img_data):
         img_data = img_data.reshape((28 * 28, 1)) / 255
         prediction = self.feed_forward(img_data)
-        prediction = prediction / prediction.sum()
+        prediction = prediction / prediction.sum() # scale such that they sum to 1
         for i in range(len(prediction)):
             print("{}: {}% confidence".format(i, round(prediction[i, 0], 2) * 100))
 
