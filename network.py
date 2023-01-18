@@ -22,7 +22,7 @@ class Network(object):
         return layer_input
 
     def stochastic_gradient_descent(self, training_data, training_labels, num_epochs, eta):
-        '''Update the network using SGD. The training data is a list of (x, y) in the form (input, desired output). Eta is the learning rate.'''
+        '''Update the network using SGD. The training data is a 4-d numpy array containing mini-batches which in turn contain images represented as a column vector. Eta is the learning rate.'''
         for epoch in range(1, num_epochs + 1):
             random_order = np.random.permutation(len(training_data))
             training_data = training_data[random_order]
@@ -46,8 +46,7 @@ class Network(object):
         self.biases = [bias_set - eta * nabla_bias_set / mini_batch_size for bias_set, nabla_bias_set in zip(self.biases, nabla_biases)] # same for each bias
     
     def backpropagate(self, x, y):
-        #nabla_weights = [np.zeros(weight_set.shape) for weight_set in self.weights]
-        #nabla_biases = [np.zeros(bias_set.shape) for bias_set in self.biases]
+        '''Returns a tuple of 2 arrays that represent the changes that need to be averaged and then applied to the weights and biases respectively. They are in the same shape as the weights and biases.'''
         nabla_weights = [None] * len(self.weights) # init blank lists for gradient of cost function
         nabla_biases = nabla_weights.copy()
         # calculate all activations in forward pass
@@ -71,16 +70,18 @@ class Network(object):
         return (nabla_weights, nabla_biases)
 
     def cost_derivative(self, output_activations, y):
-        '''The cost derivative of the quadratic cost function'''
+        '''The cost derivative of the quadratic cost function.'''
         return output_activations - y
 
     def evaluate_performance(self, test_images, test_labels):
+        '''Pass all test images and see how many are correctly identified.'''
         how_many_correct = 0
         for x, y in zip(test_images, test_labels):
             how_many_correct += int(np.argmax(self.feed_forward(x)) == y) # pass the test images into the network and get the prediction for each. The decision is taken as the highest activation in the output layer. Compare these with the labels.
         return how_many_correct
 
     def predict(self, img_data):
+        '''Take a 1-d array of image data and output prediction.'''
         img_data = img_data.reshape((28 * 28, 1)) / 255
         prediction = self.feed_forward(img_data)
         prediction = prediction / prediction.sum() # scale such that they sum to 1
